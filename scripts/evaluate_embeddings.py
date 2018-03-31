@@ -29,7 +29,6 @@ logger = logging.getLogger(__name__)
 jobs = []
 
 ## GloVe
-
 for dim in [50, 100, 200, 300]:
     jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "wiki-6B"}])
 
@@ -41,22 +40,18 @@ for corpus in ["common-crawl-42B", "common-crawl-840B"]:
     jobs.append(["fetch_GloVe", {"dim": 300, "corpus": corpus}])
 
 ## NMT
-
 jobs.append(["fetch_NMT", {"which": "FR"}])
 jobs.append(["fetch_NMT", {"which": "DE"}])
 
 ## PDC and HDC
-
 for dim in [50, 100, 300]:
     jobs.append(["fetch_PDC", {"dim": dim}])
     jobs.append(["fetch_HDC", {"dim": dim}])
 
 ## SG
-
 jobs.append(["fetch_SG_GoogleNews", {}])
 
 ## LexVec
-
 jobs.append(["fetch_LexVec", {}])
 
 ## ConceptNet Numberbatch
@@ -65,6 +60,8 @@ jobs.append(["fetch_conceptnet_numberbatch", {}])
 ## FastText
 jobs.append(["fetch_FastText", {}])
 
+## Word2Bit
+jobs.append(['fetch_Word2Bit', {}])
 
 def run_job(j):
     fn, kwargs = j

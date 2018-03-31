@@ -24,8 +24,9 @@ Features:
 
 * scikit-learn API and conventions
 * 17 popular datasets
-* 11 word embeddings (word2vec, HPCA, morphoRNNLM, GloVe, LexVec, ConceptNet, HDC/PDC and others)
+* 12 word embeddings (word2vec, HPCA, morphoRNNLM, GloVe, LexVec, ConceptNet, HDC/PDC and others)
 * methods to solve analogy, similarity and categorization tasks
+* embedding perceptual feature encoding evaluation based on semantic norm
 
 Included datasets:
 
@@ -33,7 +34,7 @@ Included datasets:
 * Google Analogy
 * MSR Analogy
 * SemEval2012
-* AP 
+* AP
 * BLESS
 * Battig
 * ESSLI (2b, 2a, 1c)
@@ -84,4 +85,3 @@ See `examples` folder.
 License
 =======
 Code is licensed under MIT, however available embeddings distributed within package might be under different license. If you are unsure please reach to authors (references are included in docstrings)
-

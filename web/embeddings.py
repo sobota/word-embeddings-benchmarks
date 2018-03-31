@@ -7,6 +7,7 @@ from os import path
 from .datasets.utils import _get_dataset_dir, _fetch_file
 from .embedding import Embedding
 
+
 def load_embedding(fname, format="word2vec_bin", normalize=True,
                    lower=False, clean_words=False, load_kwargs={}):
     """
@@ -47,7 +48,6 @@ def load_embedding(fname, format="word2vec_bin", normalize=True,
     if lower or clean_words:
         w.standardize_words(lower=lower, clean_words=clean_words, inplace=True)
     return w
-
 
 
 def fetch_GloVe(dim=300, corpus="wiki-6B", normalize=True, lower=False, clean_words=False):
@@ -93,10 +93,10 @@ def fetch_GloVe(dim=300, corpus="wiki-6B", normalize=True, lower=False, clean_wo
     Loading GloVe format can take a while
     """
     download_file = {
-            "wiki-6B": "http://nlp.stanford.edu/data/glove.6B.zip",
-            "common-crawl-42B": "http://nlp.stanford.edu/data/glove.42B.300d.zip",
-            "common-crawl-840B": "http://nlp.stanford.edu/data/glove.840B.300d.zip",
-            "twitter-27B": "http://nlp.stanford.edu/data/glove.twitter.27B.zip"
+        "wiki-6B": "http://nlp.stanford.edu/data/glove.6B.zip",
+        "common-crawl-42B": "http://nlp.stanford.edu/data/glove.42B.300d.zip",
+        "common-crawl-840B": "http://nlp.stanford.edu/data/glove.840B.300d.zip",
+        "twitter-27B": "http://nlp.stanford.edu/data/glove.twitter.27B.zip"
     }
 
     embedding_file = {
@@ -121,26 +121,25 @@ def fetch_GloVe(dim=300, corpus="wiki-6B", normalize=True, lower=False, clean_wo
     }
 
     vocab_size = {
-            "wiki-6B": 400000,
-            "common-crawl-42B": 1917494,
-            "common-crawl-840B": 2196017,
-            "twitter-27B": 1193514
+        "wiki-6B": 400000,
+        "common-crawl-42B": 1917494,
+        "common-crawl-840B": 2196017,
+        "twitter-27B": 1193514
     }
 
     assert corpus in download_file, "Unrecognized corpus"
     assert dim in embedding_file[corpus], "Not available dimensionality"
 
     _ = _fetch_file(url=download_file[corpus],
-                           data_dir="embeddings",
-                           uncompress=True,
-                           verbose=1)
+                    data_dir="embeddings",
+                    uncompress=True,
+                    verbose=1)
 
     return load_embedding(path.join(_get_dataset_dir("embeddings"), embedding_file[corpus][dim]),
-                           format="glove",
-                           normalize=normalize,
-                           lower=lower, clean_words=clean_words,\
-                           load_kwargs={"vocab_size": vocab_size[corpus], "dim": dim})
-
+                          format="glove",
+                          normalize=normalize,
+                          lower=lower, clean_words=clean_words, \
+                          load_kwargs={"vocab_size": vocab_size[corpus], "dim": dim})
 
 
 def fetch_HPCA(which, normalize=True, lower=False, clean_words=False):
@@ -174,17 +173,16 @@ def fetch_HPCA(which, normalize=True, lower=False, clean_words=False):
     Reference paper: Lebret, Collobert et al., “The Sum of Its Parts”: Joint Learning of Word and Phrase Representations with Autoencoders", 2015
     """
     download_file = {
-            "autoencoder_phrase_hpca": "https://www.dropbox.com/s/6dyf48crdmjbw1a/AHPCA.bin.gz?dl=1",
-            "hpca": "https://www.dropbox.com/s/5y5l6vyn8yn11dv/HPCA.bin.gz?dl=1"
+        "autoencoder_phrase_hpca": "https://www.dropbox.com/s/6dyf48crdmjbw1a/AHPCA.bin.gz?dl=1",
+        "hpca": "https://www.dropbox.com/s/5y5l6vyn8yn11dv/HPCA.bin.gz?dl=1"
     }
 
     path = _fetch_file(url=download_file[which],
-                        data_dir="embeddings",
-                           uncompress=False,
-                           verbose=1)
+                       data_dir="embeddings",
+                       uncompress=False,
+                       verbose=1)
 
     return load_embedding(path, format="word2vec_bin", normalize=normalize, lower=lower, clean_words=clean_words)
-
 
 
 def fetch_morphoRNNLM(which, normalize=True, lower=False, clean_words=False):
@@ -203,10 +201,6 @@ def fetch_morphoRNNLM(which, normalize=True, lower=False, clean_words=False):
       If true will only keep alphanumeric characters and "_", "-"
       Warning: shouldn't be applied to embeddings with non-ascii characters
 
-    load_kwargs:
-      Additional parameters passed to load function. Mostly useful for 'glove' format where you
-      should pass vocab_size and dim.
-
     Returns
     -------
     w: Embedding
@@ -218,19 +212,16 @@ def fetch_morphoRNNLM(which, normalize=True, lower=False, clean_words=False):
     Reference paper: Luong, Socher et al., "Better Word Representations with Recursive Neural Networks for Morphology", 2013
     """
     download_file = {
-            "CW": "https://www.dropbox.com/s/7fdj2666iqv4xbu/cwCsmRNN.bin.gz?dl=1",
-            "HSMN": "https://www.dropbox.com/s/okw1i6kc6e2jd1q/hsmnCsmRNN.bin.gz?dl=1"
+        "CW": "https://www.dropbox.com/s/7fdj2666iqv4xbu/cwCsmRNN.bin.gz?dl=1",
+        "HSMN": "https://www.dropbox.com/s/okw1i6kc6e2jd1q/hsmnCsmRNN.bin.gz?dl=1"
     }
 
     path = _fetch_file(url=download_file[which],
-                        data_dir="embeddings",
-                           uncompress=False,
-                           verbose=1)
+                       data_dir="embeddings",
+                       uncompress=False,
+                       verbose=1)
 
     return load_embedding(path, format="word2vec_bin", normalize=normalize, lower=lower, clean_words=clean_words)
-
-
-
 
 
 def fetch_NMT(which="DE", normalize=True, lower=False, clean_words=False):
@@ -265,19 +256,18 @@ def fetch_NMT(which="DE", normalize=True, lower=False, clean_words=False):
     Reference paper: Hill, Cho et al., "Embedding Word Similarity With Neural Machine Translation", 2014
     """
     dirname = _fetch_file(url="https://www.cl.cam.ac.uk/~fh295/TEmbz.tar.gz",
-                       data_dir="embeddings",
-                       uncompress=True,
-                       verbose=1)
+                          data_dir="embeddings",
+                          uncompress=True,
+                          verbose=1)
 
     assert which in ["DE", "FR"], "Unrecognized which parameter"
 
     fname = {"FR": "Trans_embds/D_RNN_500k_144h.pkl", "DE": "Trans_embds/D_german_50k_500k_168h.pkl"}
 
     return load_embedding(path.join(dirname, fname[which]),
-                           format="dict",
-                           normalize=normalize,
-                           lower=lower, clean_words=clean_words)
-
+                          format="dict",
+                          normalize=normalize,
+                          lower=lower, clean_words=clean_words)
 
 
 def fetch_PDC(dim=300, normalize=True, lower=False, clean_words=False):
@@ -314,7 +304,7 @@ def fetch_PDC(dim=300, normalize=True, lower=False, clean_words=False):
 
     url = {
         50: "https://www.dropbox.com/s/0ofi1glri8l42y1/wikicorp.201004-pdc-"
-             "iter-20-alpha-0.05-window-10-dim-50-neg-10-subsample-0.0001.txt.bz2?dl=1",
+            "iter-20-alpha-0.05-window-10-dim-50-neg-10-subsample-0.0001.txt.bz2?dl=1",
         100: "https://www.dropbox.com/s/fmvegh4j62hulr0/wikicorp.201004-pdc-"
              "iter-20-alpha-0.05-window-10-dim-100-neg-10-subsample-0.0001.txt.bz2?dl=1",
         300: "https://www.dropbox.com/s/jppkd6j2xxb9v48/wikicorp.201004-pdc-"
@@ -323,10 +313,10 @@ def fetch_PDC(dim=300, normalize=True, lower=False, clean_words=False):
     assert dim in url, "Unavailable dimensionality"
 
     path = _fetch_file(url=url[dim],
-                        data_dir="embeddings",
-                           uncompress=False,
-                           move="pdc/pdc{}.txt.bz2".format(dim),
-                           verbose=1)
+                       data_dir="embeddings",
+                       uncompress=False,
+                       move="pdc/pdc{}.txt.bz2".format(dim),
+                       verbose=1)
 
     return load_embedding(path, format="word2vec", normalize=normalize, lower=lower, clean_words=clean_words)
 
@@ -374,13 +364,12 @@ def fetch_HDC(dim=300, normalize=True, lower=False, clean_words=False):
     assert dim in url, "Unavailable dimensionality"
 
     path = _fetch_file(url=url[dim],
-                        data_dir="embeddings",
-                           uncompress=False,
-                           move="hdc/hdc{}.txt.bz2".format(dim),
-                           verbose=1)
+                       data_dir="embeddings",
+                       uncompress=False,
+                       move="hdc/hdc{}.txt.bz2".format(dim),
+                       verbose=1)
 
     return load_embedding(path, format="word2vec", normalize=normalize, lower=lower, clean_words=clean_words)
-
 
 
 def fetch_SG_GoogleNews(normalize=True, lower=False, clean_words=False):
@@ -411,9 +400,10 @@ def fetch_SG_GoogleNews(normalize=True, lower=False, clean_words=False):
     Original source: https://code.google.com/p/word2vec/
     """
     path = _fetch_file(url="https://www.dropbox.com/s/bnm0trligffakd9/GoogleNews-vectors-negative300.bin.gz?dl=1",
-                           data_dir="embeddings",
-                           verbose=1)
+                       data_dir="embeddings",
+                       verbose=1)
     return load_embedding(path, format="word2vec_bin", normalize=normalize, lower=lower, clean_words=clean_words)
+
 
 def fetch_LexVec(which="commoncrawl-W+C", normalize=True, lower=False, clean_words=False):
     """
@@ -445,15 +435,15 @@ def fetch_LexVec(which="commoncrawl-W+C", normalize=True, lower=False, clean_wor
     Reference paper: Salle, Alexandre, Marco Idiart, and Aline Villavicencio. Matrix Factorization using Window Sampling and Negative Sampling for Improved Word Representations. The 54th Annual Meeting of the Association for Computational Linguistics. 2016.
     """
     download_file = {
-            "commoncrawl-W": "http://nlpserver2.inf.ufrgs.br/alexandres/vectors/lexvec.commoncrawl.300d.W.pos.vectors.gz",
-            "commoncrawl-W+C": "http://nlpserver2.inf.ufrgs.br/alexandres/vectors/lexvec.commoncrawl.300d.W+C.pos.vectors.gz",
-            "wikipedia+newscrawl-W": "http://nlpserver2.inf.ufrgs.br/alexandres/vectors/lexvec.enwiki%2bnewscrawl.300d.W.pos.vectors.gz",
-            "wikipedia+newscrawl-W+C": "http://nlpserver2.inf.ufrgs.br/alexandres/vectors/lexvec.enwiki%2bnewscrawl.300d.W+C.pos.vectors.gz",
+        "commoncrawl-W": "http://nlpserver2.inf.ufrgs.br/alexandres/vectors/lexvec.commoncrawl.300d.W.pos.vectors.gz",
+        "commoncrawl-W+C": "http://nlpserver2.inf.ufrgs.br/alexandres/vectors/lexvec.commoncrawl.300d.W+C.pos.vectors.gz",
+        "wikipedia+newscrawl-W": "http://nlpserver2.inf.ufrgs.br/alexandres/vectors/lexvec.enwiki%2bnewscrawl.300d.W.pos.vectors.gz",
+        "wikipedia+newscrawl-W+C": "http://nlpserver2.inf.ufrgs.br/alexandres/vectors/lexvec.enwiki%2bnewscrawl.300d.W+C.pos.vectors.gz",
     }
 
     path = _fetch_file(url=download_file[which],
-                        data_dir="embeddings",
-                        verbose=1)
+                       data_dir="embeddings",
+                       verbose=1)
 
     return load_embedding(path, format="word2vec", normalize=normalize, lower=lower, clean_words=clean_words)
 
@@ -486,7 +476,7 @@ def fetch_conceptnet_numberbatch(clean_words=False):
     return load_embedding(path, format='word2vec', normalize=False, clean_words=clean_words)
 
 
-def fetch_FastText(lang="en", normalize=True, lower=False, clean_words=False):
+def fetch_FastText(lang="en", corpus='wiki', normalize=True, lower=False, clean_words=False):
     """
        Fetches fastText embeddings
 
@@ -496,8 +486,9 @@ def fetch_FastText(lang="en", normalize=True, lower=False, clean_words=False):
          Can choose between all accessible language on page:
          https://fasttext.cc/docs/en/pretrained-vectors.html#content
 
-       normalize: bool, default: True
-         If true will normalize all vector to unit length
+       corpus: string, default: wiki
+         Corpus that FastText vector were trained on.
+         Available corpuses: "wiki", "common-crawl"
 
        lower: bool, default: False
          If true, will convert string to lowercase
@@ -515,9 +506,11 @@ def fetch_FastText(lang="en", normalize=True, lower=False, clean_words=False):
        ----------
        Published at https://fasttext.cc/
        """
+    download_file = {'wiki': 'https://s3-us-west-1.amazonaws.com/fasttext-vectors/wiki.{}.vec'.format(lang),
+                     'common-crawl': 'https://s3-us-west-1.amazonaws.com/fasttext-vectors/word-vectors-v2/cc.{}.300.vec.gz'.format(
+                         lang)}
 
-    url_vec = 'https://s3-us-west-1.amazonaws.com/fasttext-vectors/wiki.{}.vec'.format(lang)
-
+    url_vec = download_file[corpus.lower()]
     path = _fetch_file(url=url_vec, data_dir='embeddings',
                        uncompress=False,
                        verbose=1)
@@ -525,7 +518,50 @@ def fetch_FastText(lang="en", normalize=True, lower=False, clean_words=False):
     return load_embedding(path, format='word2vec', normalize=normalize, lower=lower, clean_words=clean_words)
 
 
-# TODO: uncomment after training is finished
+def fetch_Word2Bit(bitlevel=0, size=200, vocab_size='400K', normalize=True, lower=False, clean_words=False):
+    """
+       Fetches Word2bits embeddings
+
+       Parameters
+       ----------
+       bitlevel: int, default: 2
+         Choose between all accessible levels on page:
+         https://github.com/agnusmaximus/Word2Bits
+
+       size: int, default:200
+         Vector size (length).
+
+       vocab_size: string, default: 400k
+         Number of words in embedding file.
+
+       lower: bool, default: False
+         If true, will convert string to lowercase
+
+       clean_words: bool, default: False
+         If true will only keep alphanumeric characters and "_", "-"
+         Warning: shouldn't be applied to embeddings with non-ascii characters
+
+       Returns
+       -------
+       w: Embedding
+         Instance of Embedding class
+
+       References
+       ----------
+       Published at https://github.com/agnusmaximus/Word2Bits
+       See also https://arxiv.org/abs/1803.05651
+       """
+    url_vec = 'http://web.stanford.edu/~maxlam/word_vectors/compressed/{}/w2b_bitlevel{}_size{}_vocab{}.tar.gz'.format(
+        vocab_size, bitlevel, size, vocab_size)
+
+    path = _fetch_file(url=url_vec, data_dir='embeddings',
+                       uncompress=False, verbose=1)
+    v_size = {'400K': int(4E5), '3.7M': 3766989}
+
+    return load_embedding(path, format='glove', normalize=normalize, lower=lower, clean_words=clean_words,
+                          load_kwargs={"vocab_size": v_size[vocab_size],
+                                       "dim": size})
+
 # def fetch_SG_wiki(normalize=True, lower=False, clean_words=True):
 #     """
 #     Fetches SG (skip-gram) embeddings trained on recent (12.2015) Wiki corpus using gensim
