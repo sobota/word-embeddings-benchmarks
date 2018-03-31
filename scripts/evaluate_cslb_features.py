@@ -25,6 +25,7 @@ if __name__ == '__main__':
 
     jobs = []
 
+    # GloVe
     for dim in [50, 100, 200, 300]:
         jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "wiki-6B"}])
 
