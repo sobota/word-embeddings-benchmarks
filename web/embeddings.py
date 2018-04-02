@@ -518,7 +518,7 @@ def fetch_FastText(lang="en", corpus='wiki', normalize=True, lower=False, clean_
     return load_embedding(path, format='word2vec', normalize=normalize, lower=lower, clean_words=clean_words)
 
 
-def fetch_Word2Bit(bitlevel=0, size=200, vocab_size='400K', normalize=True, lower=False, clean_words=False):
+def fetch_Word2Bits(bitlevel=0, size=200, vocab_size='400K', normalize=True, lower=False, clean_words=False):
     """
        Fetches Word2bits embeddings
 

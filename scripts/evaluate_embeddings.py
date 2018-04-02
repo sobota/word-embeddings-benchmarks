@@ -60,8 +60,8 @@ jobs.append(["fetch_conceptnet_numberbatch", {}])
 ## FastText
 jobs.append(["fetch_FastText", {}])
 
-## Word2Bit
-jobs.append(['fetch_Word2Bit', {}])
+## Word2Bits
+jobs.append(['fetch_Word2Bits', {}])
 
 def run_job(j):
     fn, kwargs = j

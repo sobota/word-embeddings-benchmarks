@@ -52,8 +52,8 @@ if __name__ == '__main__':
     # FastText
     jobs.append(["fetch_FastText", {}])
 
-    # Word2Bit
-    jobs.append(['fetch_Word2Bit', {}])
+    # Word2Bits
+    jobs.append(['fetch_Word2Bits', {}])
 
     n_jobs = opts.n_jobs
 
