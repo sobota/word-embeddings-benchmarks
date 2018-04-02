@@ -68,4 +68,5 @@ if __name__ == '__main__':
 
         logging.info('End of experiment for {}'.format(title_part))
 
-        Pool(n_jobs).map(run_job, jobs)
+
+    Pool(n_jobs).map(run_job, jobs)
