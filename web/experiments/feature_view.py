@@ -15,7 +15,7 @@ from sklearn.model_selection import LeaveOneOut, GridSearchCV
 from tqdm import tqdm
 
 
-def process_CSLB(*embs, feature_matrix_path='../CSLB/feature_matrix.dat'):
+def _process_CSLB(*embs, feature_matrix_path):
     df = pd.read_csv(feature_matrix_path, sep='\t', index_col=0)
 
     t = df.transpose()
@@ -71,11 +71,8 @@ def process_CSLB(*embs, feature_matrix_path='../CSLB/feature_matrix.dat'):
     return cleaned_df
 
 
-def learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, random_state=None, nb_hyper=20,
-                    max_iter=None):
-    vecs, words = embedding.vectors, embedding.words
-    #  feature_name -> f1_score
-
+def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, random_state=None, nb_hyper=20,
+                     max_iter=None):
     X = np.asarray([embedding[c_w] for c_w in concepts])
 
     # features in semantic norms
@@ -94,28 +91,46 @@ def learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, rand
 
         logging.info('F1 score {} for feature {} with params {}'.format(f1s, f, cv_parms))
 
-        return f, f1s, cv_parms['alpha']
+        end_coef = gs.best_estimator_.coef_
+        end_iter = gs.best_estimator_.n_iter_
+        end_intercept = gs.best_estimator_.intercept_
+
+        params = [cv_parms['alpha'], end_iter, end_intercept[0], *(end_coef.flatten())]
+
+        return f, f1s, params
 
     data = map(train, tqdm(features, desc='Train logreg for each feature'))
 
     data = np.asarray(list(data))
 
     features_f1_scored = dict(zip(data[:, 0], data[:, 1]))
-    features_cv_params = dict(zip(data[:, 0], data[:, 2]))
+    features_params = np.delete(data, np.s_[1], axis=1)
 
-    return features_f1_scored, features_cv_params
+    return features_f1_scored, features_params
 
 
-def generate_figure(fs_id, fig_title, norms_path='./CSLB',
-                    fig_path='./cslb_feature_view_{:%d-%m-%Y_%H:%M}.png'.format(datetime.datetime.now()),
-                    show_visual=False):
+def _generate_figure(fs_id, fig_title, norms_path='./CSLB',
+                     fig_path='./cslb_feature_view_{:%d-%m-%Y_%H:%M}.png'.format(datetime.datetime.now()),
+                     show_visual=False):
     """
     This function generate picture for feature categories according to CLSB classification
-    :param fs_id: map between features and F1-score for logreg trained for it
-    :param norms_path: path to cslb dat files
-    :param fig_path: path where figure is saved. If is None figure is not stored
-    :param fig_title: added to title after CSLB
-    :param show_visual: show swarmplot using matplotlib
+
+    Parameters
+    ----------
+    fs_id: dict
+        Keys are features and F1-score are values for logreg trained for it
+
+    norms_path: string
+        Path to cslb dat files
+
+    fig_path: string
+    Path where figure is saved. If is None figure is not stored
+
+    fig_title: string
+        added to title after CSLB
+
+    show_visual: bool
+        show swarmplot using matplotlib
     """
 
     # for feature fit
@@ -168,23 +183,29 @@ def generate_figure(fs_id, fig_title, norms_path='./CSLB',
     plt.close()
 
 
-def store_data(fs_id, fp_id, file_path):
-    score_df = pd.DataFrame(list(fs_id.items()), columns=['Feature', 'F1score'])
-    alpha_df = pd.DataFrame(list(fp_id.items()), columns=['Feature', 'Alpha'])
+def _store_data(fs_id, fp_id, file_path):
 
-    df = pd.merge(score_df, alpha_df, on='Feature')
+    score_df = pd.DataFrame(list(fs_id.items()), columns=['Feature', 'F1score'])
+
+    params_data = {'Feature': fp_id[:, 0], 'Alpha': fp_id[:, 1], 'EndIter': fp_id[:, 2], 'Intercept': fp_id[:, 3],
+                   'Coefs': list(fp_id[:, 4:])}
+
+    params_df = pd.DataFrame(params_data, columns=['Feature', 'Alpha', 'EndIter', 'Intercept', 'Coefs'])
+
+    df = score_df.merge(right=params_df, on='Feature')
+
     df = df.set_index('Feature')
     df.sort_index(inplace=True)
-
     logging.info('Saving: {}'.format(file_path))
     df.to_csv(file_path)
+
 
 
 def figure_from_csv(path, fig_title):
     df = pd.read_csv(path, index_col=0)
     d = dict(zip(df.index.tolist, df.F1score.values))
 
-    generate_figure(fs_id=d, fig_title=fig_title)
+    _generate_figure(fs_id=d, fig_title=fig_title)
 
 
 def cslb_experiment(embedding, cslb_path='./CSLB',
@@ -193,17 +214,39 @@ def cslb_experiment(embedding, cslb_path='./CSLB',
     """
     Evaluate how well embedding encode features perceptual features. This experiment use CSLB semantic norms.
 
-    Based on whitepaper:
-    'Are distributional representations ready for the real world? Evaluating word vectors for grounded perceptual meaning'
-    :param embedding: dict or list of tuples (function_to_call, embedding_name)
-    :param cslb_path: to folder with cslb files norms.dat and feature_matrix.dat
-    :param n_jobs: numbers of threads used for learning
-    :param save_path: path where figures and progress files will be saved
-    :param figure_desc: description after 'CSLB' in title
-    :param random_state: seed. Important for replicability
-    :param nb_hyper: number of hyperparm value to select
-    :param max_iter: max iter of SGD
-    :param show_dialog: when is False matplotlib Agg backend is used for generating figures
+    Parameters
+    ----------
+    embedding: Embedding object
+        Loaded embedding
+
+    cslb_path: string
+        Path to folder with cslb files norms.dat and feature_matrix.dat
+
+    n_jobs: int
+        Numbers of threads used for learning
+
+    save_path: string
+        Path where figures and progress files will be saved
+
+    figure_desc: string
+        Description after 'CSLB' in title
+
+    random_state: int or RandomState
+        Seed important for replicability
+
+    nb_hyper: int
+        Number of hyperparm value to select
+
+    max_iter: int
+        Max iter of SGD
+
+    show_dialog: bool
+        When is False matplotlib Agg backend is used for generating figures
+
+    References
+    ----------
+        Reference paper: 'Are distributional representations ready for the real world? Evaluating word vectors for grounded perceptual meaning'
+        https://arxiv.org/abs/1705.11168
     """
     cslb_matrix = os.path.join(cslb_path, 'feature_matrix.dat')
     cslb_norm = os.path.join(cslb_path, 'norms.dat')
@@ -216,7 +259,7 @@ def cslb_experiment(embedding, cslb_path='./CSLB',
         print("Download CSLB file first from website: http://www.csl.psychol.cam.ac.uk/propertynorms/", file=sys.stderr)
         raise FileNotFoundError(os.errno.ENOENT, os.strerror(os.errno.ENOENT), cslb_norm)
 
-    cleaned = process_CSLB(embedding, feature_matrix_path=cslb_matrix)
+    cleaned = _process_CSLB(embedding, feature_matrix_path=cslb_matrix)
 
     logging.info('Shape of cleaned CSLB is {}'.format(cleaned.shape))
     cdf = cleaned.transpose()
@@ -224,8 +267,8 @@ def cslb_experiment(embedding, cslb_path='./CSLB',
     concepts = [str(x) for x in cdf.index]
     features = cdf.columns
 
-    fs_id, fp_id = learn_logit_reg(embedding=embedding, features=features, concepts=concepts, cleaned_norms=cleaned,
-                                   n_jobs=n_jobs, random_state=random_state, max_iter=max_iter)
+    fs_id, fp_id = _learn_logit_reg(embedding=embedding, features=features, concepts=concepts, cleaned_norms=cleaned,
+                                    n_jobs=n_jobs, random_state=random_state, max_iter=max_iter, nb_hyper=nb_hyper)
     logging.info('Generating Plots')
 
     now_dt = datetime.datetime.now()
@@ -233,8 +276,8 @@ def cslb_experiment(embedding, cslb_path='./CSLB',
     fig_path = os.path.join(save_path,
                             'cslb_{}_{:%d-%m-%Y_%H:%M}.png'.format(re.sub('\s', '', figure_desc), now_dt))
 
-    generate_figure(fs_id, fig_title=figure_desc, norms_path=cslb_norm, fig_path=fig_path, show_visual=show_dialog)
+    _generate_figure(fs_id, fig_title=figure_desc, norms_path=cslb_norm, fig_path=fig_path, show_visual=show_dialog)
 
     store_path = os.path.join(save_path,
                               'cslb_f1_params_{}_{:%d-%m-%Y_%H:%M}.csv'.format(re.sub('\s', '', figure_desc), now_dt))
-    store_data(fs_id, fp_id, store_path)
+    _store_data(fs_id, fp_id, store_path)
