@@ -43,7 +43,7 @@ def test_cleaning_cslb():
 
     emb = Embedding.from_dict(w_vec)
 
-    clean = _process_CSLB(emb, feature_matrix_path='../experiments/CSLB/feature_matrix.dat')
+    clean = _process_CSLB('../experiments/CSLB/feature_matrix.dat', emb)
 
     cdf = clean.transpose()
     for f in cdf.columns:
@@ -65,7 +65,7 @@ def test_on_real_embedding():
 
     emb = fetch_GloVe(corpus='wiki-6B', dim=50)
 
-    clean = _process_CSLB(emb, feature_matrix_path='../experiments/CSLB/feature_matrix.dat')
+    clean = _process_CSLB('../experiments/CSLB/feature_matrix.dat', emb)
 
     cdf = clean.transpose()
     for f in cdf.columns:

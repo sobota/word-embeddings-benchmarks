@@ -15,7 +15,7 @@ from sklearn.model_selection import LeaveOneOut, GridSearchCV
 from tqdm import tqdm
 
 
-def _process_CSLB(*embs, feature_matrix_path):
+def _process_CSLB(feature_matrix_path, *embs):
     df = pd.read_csv(feature_matrix_path, sep='\t', index_col=0)
 
     t = df.transpose()
@@ -95,7 +95,8 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
         end_iter = gs.best_estimator_.n_iter_
         end_intercept = gs.best_estimator_.intercept_
 
-        params = [cv_parms['alpha'], end_iter, end_intercept[0], *(end_coef.flatten())]
+        params = [cv_parms['alpha'], end_iter, end_intercept[0]]
+        params.extend(end_coef.flatten())
 
         return f, f1s, params
 
@@ -184,7 +185,6 @@ def _generate_figure(fs_id, fig_title, norms_path='./CSLB',
 
 
 def _store_data(fs_id, fp_id, file_path):
-
     score_df = pd.DataFrame(list(fs_id.items()), columns=['Feature', 'F1score'])
 
     params_data = {'Feature': fp_id[:, 0], 'Alpha': fp_id[:, 1], 'EndIter': fp_id[:, 2], 'Intercept': fp_id[:, 3],
@@ -198,7 +198,6 @@ def _store_data(fs_id, fp_id, file_path):
     df.sort_index(inplace=True)
     logging.info('Saving: {}'.format(file_path))
     df.to_csv(file_path)
-
 
 
 def figure_from_csv(path, fig_title):
@@ -259,7 +258,7 @@ def cslb_experiment(embedding, cslb_path='./CSLB',
         print("Download CSLB file first from website: http://www.csl.psychol.cam.ac.uk/propertynorms/", file=sys.stderr)
         raise FileNotFoundError(os.errno.ENOENT, os.strerror(os.errno.ENOENT), cslb_norm)
 
-    cleaned = _process_CSLB(embedding, feature_matrix_path=cslb_matrix)
+    cleaned = _process_CSLB(cslb_matrix, embedding)
 
     logging.info('Shape of cleaned CSLB is {}'.format(cleaned.shape))
     cdf = cleaned.transpose()

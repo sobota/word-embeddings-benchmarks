@@ -56,7 +56,7 @@ def cslb_on_gaussian_experiment(dimension, loc=0.0, scale=1.0, cslb_path='./CSLB
     embedding = Embedding.from_dict(
         gaussian_embedding(dim=dimension, words=words, loc=loc, scale=scale))
 
-    cleaned = _process_CSLB(embedding, feature_matrix_path=cslb_matrix)
+    cleaned = _process_CSLB(cslb_matrix, embedding)
 
     logging.info('Shape of cleaned CSLB is {}'.format(cleaned.shape))
     cdf = cleaned.transpose()
