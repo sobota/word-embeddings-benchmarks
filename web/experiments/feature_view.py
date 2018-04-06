@@ -269,15 +269,15 @@ def evaluate_cslb(embedding, cslb_path='./CSLB',
 
     fs_id, fp_id = _learn_logit_reg(embedding=embedding, features=features, concepts=concepts, cleaned_norms=cleaned,
                                     n_jobs=n_jobs, random_state=random_state, max_iter=max_iter, nb_hyper=nb_hyper)
-    logging.info('Generating Plots')
+    logging.info('Generating Plots & Storing Data')
 
     now_dt = datetime.datetime.now()
 
     fig_path = os.path.join(save_path,
                             'cslb_{}_{:%d-%m-%Y_%H:%M}.png'.format(re.sub('\s', '', figure_desc), now_dt))
-
-    _generate_figure(fs_id, fig_title=figure_desc, norms_path=cslb_norm, fig_path=fig_path, show_visual=display_figure)
-
     store_path = os.path.join(save_path,
                               'cslb_f1_params_{}_{:%d-%m-%Y_%H:%M}.csv'.format(re.sub('\s', '', figure_desc), now_dt))
+
     _store_data(fs_id, fp_id, store_path)
+
+    _generate_figure(fs_id, fig_title=figure_desc, norms_path=cslb_norm, fig_path=fig_path, show_visual=display_figure)
