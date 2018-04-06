@@ -44,6 +44,7 @@ Included datasets:
 * RW
 * SimLex999
 * MEN
+* CSLB
 
 Note: embeddings are not hosted currently on a proper server, if the download is too slow consider downloading embeddings manually from original sources referred in docstrings.
 

@@ -201,16 +201,16 @@ def _store_data(fs_id, fp_id, file_path):
     df.to_csv(file_path)
 
 
-def figure_from_csv(path, fig_title):
+def generate_figure(path, fig_title):
     df = pd.read_csv(path, index_col=0)
     d = dict(zip(df.index.tolist, df.F1score.values))
 
     _generate_figure(fs_id=d, fig_title=fig_title)
 
 
-def cslb_experiment(embedding, cslb_path='./CSLB',
-                    save_path='./', figure_desc='', n_jobs=4, random_state=0, nb_hyper=20, max_iter=1800,
-                    show_dialog=False):
+def evaluate_cslb(embedding, cslb_path='./CSLB',
+                  save_path='./', figure_desc='', n_jobs=4, random_state=0, nb_hyper=20, max_iter=1800,
+                  display_figure=False):
     """
     Evaluate how well embedding encode features perceptual features. This experiment use CSLB semantic norms.
 
@@ -235,12 +235,12 @@ def cslb_experiment(embedding, cslb_path='./CSLB',
         Seed important for replicability
 
     nb_hyper: int
-        Number of hyperparm value to select
+        Number of hyperparm value to select. Used by logistics regression for each feature independly.
 
     max_iter: int
         Max iter of SGD
 
-    show_dialog: bool
+    display_figure: bool
         When is False matplotlib Agg backend is used for generating figures
 
     References
@@ -276,7 +276,7 @@ def cslb_experiment(embedding, cslb_path='./CSLB',
     fig_path = os.path.join(save_path,
                             'cslb_{}_{:%d-%m-%Y_%H:%M}.png'.format(re.sub('\s', '', figure_desc), now_dt))
 
-    _generate_figure(fs_id, fig_title=figure_desc, norms_path=cslb_norm, fig_path=fig_path, show_visual=show_dialog)
+    _generate_figure(fs_id, fig_title=figure_desc, norms_path=cslb_norm, fig_path=fig_path, show_visual=display_figure)
 
     store_path = os.path.join(save_path,
                               'cslb_f1_params_{}_{:%d-%m-%Y_%H:%M}.csv'.format(re.sub('\s', '', figure_desc), now_dt))

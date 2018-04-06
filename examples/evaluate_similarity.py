@@ -3,6 +3,7 @@
 """
  Simple example showing evaluating embedding on similarity datasets
 """
+from __future__ import print_function
 import logging
 from six import iteritems
 from web.datasets.similarity import fetch_MEN, fetch_WS353, fetch_SimLex999
@@ -28,5 +29,4 @@ for name, data in iteritems(tasks):
 
 # Calculate results using helper function
 for name, data in iteritems(tasks):
-    print "Spearman correlation of scores on {} {}".format(name, evaluate_similarity(w_glove, data.X, data.y))
-
+    print("Spearman correlation of scores on {} {}".format(name, evaluate_similarity(w_glove, data.X, data.y)))

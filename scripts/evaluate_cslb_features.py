@@ -6,7 +6,7 @@ import sys
 
 from web import embeddings
 
-from web.experiments.feature_view import cslb_experiment
+from web.experiments.feature_view import evaluate_cslb
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -63,8 +63,8 @@ if __name__ == '__main__':
 
         w = getattr(embeddings, fn)(**kwargs)
         title_part = '{}({})'.format(fn, kwargs)
-        cslb_experiment(w, figure_desc=title_part, cslb_path=opts.cslb_path, save_path=opts.save_path, n_jobs=n_jobs,
-                        max_iter=opts.max_iter)
+        evaluate_cslb(w, figure_desc=title_part, cslb_path=opts.cslb_path, save_path=opts.save_path, n_jobs=n_jobs,
+                      max_iter=opts.max_iter)
 
         logging.info('End of experiment for {}'.format(title_part))
 
