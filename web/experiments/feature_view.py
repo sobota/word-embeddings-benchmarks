@@ -88,7 +88,9 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
 
         gs.fit(X, y)
         f1s = f1_score(y_true=y, y_pred=gs.predict(X))
+        # f1s = f1_score(y_true=y, y_pred=y)
         cv_parms = gs.best_params_
+        # cv_parms = {'alpha': 72.1}
 
         logging.info('F1 score {} for feature {} with params {}'.format(f1s, f, cv_parms))
 
@@ -96,14 +98,19 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
         end_iter = gs.best_estimator_.n_iter_
         end_intercept = gs.best_estimator_.intercept_
 
-        params = [cv_parms['alpha'], end_iter, end_intercept[0]]
+        # end_coef = np.random.normal(size=50)
+        # end_iter = 1200
+        # end_intercept = [23.891]
+
+        # f, f1score, alpha, end_iter, intercept, rest_of_params
+        params = [f, f1s, cv_parms['alpha'], end_iter, end_intercept[0]]
         params.extend(end_coef.flatten())
 
-        return f, f1s, params
+        return params
 
-    data = map(train, tqdm(features, desc='Train logreg for each feature'))
+    data = list(map(train, tqdm(features, desc='Train logreg for each feature')))
 
-    data = np.asarray(list(data))
+    data = np.asarray(data)
 
     features_f1_scored = dict(zip(data[:, 0], data[:, 1]))
     features_params = np.delete(data, np.s_[1], axis=1)
@@ -188,6 +195,7 @@ def _generate_figure(fs_id, fig_title, norms_path='./CSLB',
 def _store_data(fs_id, fp_id, file_path):
     score_df = pd.DataFrame(list(fs_id.items()), columns=['Feature', 'F1score'])
 
+    # f, f1score, alpha, end_iter, intercept, rest_of_params
     params_data = {'Feature': fp_id[:, 0], 'Alpha': fp_id[:, 1], 'EndIter': fp_id[:, 2], 'Intercept': fp_id[:, 3],
                    'Coefs': list(fp_id[:, 4:])}
 
