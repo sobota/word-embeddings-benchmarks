@@ -126,7 +126,7 @@ def _generate_figure(fs_id, fig_title, norms_path='./CSLB',
         Path to cslb dat files
 
     fig_path: string
-    Path where figure is saved. If is None figure is not stored
+        Path where figure is saved. If is None figure is not stored
 
     fig_title: string
         added to title after CSLB
@@ -235,7 +235,7 @@ def evaluate_cslb(embedding, cslb_path='./CSLB',
         Seed important for replicability
 
     nb_hyper: int
-        Number of hyperparm value to select. Used by logistics regression for each feature independly.
+        Number of hyperparm value to select. Used by logistics regression for each feature independly
 
     max_iter: int
         Max iter of SGD
