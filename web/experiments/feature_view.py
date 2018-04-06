@@ -129,10 +129,10 @@ def _generate_figure(fs_id, fig_title, norms_path='./CSLB',
         Path where figure is saved. If is None figure is not stored
 
     fig_title: string
-        added to title after CSLB
+        Added to title after CSLB
 
     show_visual: bool
-        show swarmplot using matplotlib
+        Show swarmplot using matplotlib
     """
 
     # for feature fit
