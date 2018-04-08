@@ -83,7 +83,7 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
         gs = GridSearchCV(
             estimator=SGDClassifier(loss='log', class_weight='balanced', eta0=0.01, learning_rate='optimal',
                                     n_jobs=n_jobs, max_iter=max_iter, tol=1e-3, random_state=random_state),
-            cv=LeaveOneOut(), param_grid={'alpha': np.linspace(start=0.0001, stop=16.0, num=nb_hyper)}, n_jobs=n_jobs,
+            cv=LeaveOneOut(), param_grid={'alpha': np.linspace(start=1e-7, stop=1.0, num=nb_hyper)}, n_jobs=n_jobs,
             scoring=make_scorer(f1_score))
 
         gs.fit(X, y)

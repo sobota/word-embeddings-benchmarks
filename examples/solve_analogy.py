@@ -3,6 +3,7 @@
 """
  Simple example showing answering analogy questions
 """
+from __future__ import print_function
 import logging
 from web.datasets.analogy import fetch_google_analogy
 from web.embeddings import fetch_SG_GoogleNews
