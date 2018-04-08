@@ -26,9 +26,9 @@ if __name__ == '__main__':
     jobs = []
 
     # GloVe
-    for dim in [50]:  # , 100, 200, 300]:
+    for dim in [50, 100, 200, 300]:
         jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "wiki-6B"}])
-    #
+
     # for dim in [25, 50, 100, 200]:
     #     jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "twitter-27B"}])
     #
@@ -49,11 +49,11 @@ if __name__ == '__main__':
     # # ConceptNet Numberbatch
     # jobs.append(["fetch_conceptnet_numberbatch", {}])
     #
-    # # FastText
-    # jobs.append(["fetch_FastText", {}])
+    # FastText
+    jobs.append(["fetch_FastText", {}])
     #
-    # # Word2Bits
-    # jobs.append(['fetch_Word2Bits', {}])
+    # Word2Bits
+    jobs.append(['fetch_Word2Bits', {}])
 
     n_jobs = opts.n_jobs
 
