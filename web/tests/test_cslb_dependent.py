@@ -43,7 +43,7 @@ def test_cleaning_cslb():
 
     emb = Embedding.from_dict(w_vec)
 
-    clean = _process_CSLB('./data/mocked_feature_matrix.dat', emb)
+    clean = _process_CSLB('./web/tests/data/mocked_feature_matrix.dat', emb)
 
     cdf = clean.transpose()
     for f in cdf.columns:
@@ -65,7 +65,7 @@ def test_on_real_embedding():
 
     emb = fetch_GloVe(corpus='wiki-6B', dim=50)
 
-    clean = _process_CSLB('./data/mocked_feature_matrix.dat', emb)
+    clean = _process_CSLB('./web/tests/data/mocked_feature_matrix.dat', emb)
 
     cdf = clean.transpose()
     for f in cdf.columns:
@@ -234,7 +234,8 @@ def test_figure_generation():
     if os.path.isfile(save_fig_path):
         os.remove(save_fig_path)
 
-    _generate_figure(feature_f1, norms_path='./data/mocked_norms.dat', fig_path=save_fig_path, show_visual=False,
+    _generate_figure(feature_f1, norms_path='./web/tests/data/mocked_norms.dat', fig_path=save_fig_path,
+                     show_visual=False,
                      fig_title='TEST_FIGURE_GENERATION')
 
     # todo better way for validation chart?
