@@ -203,11 +203,11 @@ def _store_data(fs_id, fp_id, file_path):
     df.to_csv(file_path)
 
 
-def generate_figure(path, fig_title):
+def generate_figure(path, fig_title, norms_path):
     df = pd.read_csv(path, index_col=0)
-    d = dict(zip(df.index.tolist, df.F1score.values.tolist()))
+    d = dict(zip(df.index.tolist(), df.F1score.values))
 
-    _generate_figure(fs_id=d, fig_title=fig_title)
+    _generate_figure(fs_id=d, fig_title=fig_title, norms_path=norms_path)
 
 
 def evaluate_cslb(embedding, cslb_path='./CSLB',
