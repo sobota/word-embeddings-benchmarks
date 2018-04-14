@@ -91,7 +91,7 @@ def test_learn_logits_on_syntetic_CSLB():
     w_vec = dict(zip(words, vecs))
     emb = Embedding.from_dict(w_vec)
 
-    f1, _ = _learn_logit_reg(emb, features, words, cleaned, n_jobs=45, max_iter=1000, nb_hyper=2)
+    f1, _ = _learn_logit_reg(emb, features, words, cleaned, n_jobs=45, max_iter=700, nb_hyper=2)
 
     logging.info('F1 scores', f1)
 

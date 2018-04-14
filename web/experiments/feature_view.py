@@ -83,24 +83,18 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
         gs = GridSearchCV(
             estimator=SGDClassifier(loss='log', class_weight='balanced', eta0=0.01, learning_rate='optimal',
                                     n_jobs=n_jobs, max_iter=max_iter, tol=1e-3, random_state=random_state),
-            cv=LeaveOneOut(), param_grid={'alpha': np.linspace(start=1e-7, stop=1.0, num=nb_hyper)}, n_jobs=n_jobs,
+            cv=LeaveOneOut(), param_grid={'alpha': np.logspace(start=-7, stop=1.0, num=nb_hyper)}, n_jobs=n_jobs,
             scoring=make_scorer(f1_score))
 
         gs.fit(X, y)
         f1s = f1_score(y_true=y, y_pred=gs.predict(X))
-        # f1s = f1_score(y_true=y, y_pred=y)
         cv_parms = gs.best_params_
-        # cv_parms = {'alpha': 72.1}
 
         logging.info('F1 score {} for feature {} with params {}'.format(f1s, f, cv_parms))
 
         end_coef = gs.best_estimator_.coef_
         end_iter = gs.best_estimator_.n_iter_
         end_intercept = gs.best_estimator_.intercept_
-
-        # end_coef = np.random.normal(size=50)
-        # end_iter = 1200
-        # end_intercept = [23.891]
 
         # f, f1score, alpha, end_iter, intercept, rest_of_params
         params = [f, f1s, cv_parms['alpha'], end_iter, end_intercept[0]]
@@ -118,7 +112,7 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
     return features_f1_scored, features_params
 
 
-def _generate_figure(fs_id, fig_title, norms_path='./CSLB',
+def _generate_figure(fs_id, fig_title, norms_path='./CSLB/norms.dat',
                      fig_path='./cslb_feature_view_{:%d-%m-%Y_%H:%M}.png'.format(datetime.datetime.now()),
                      show_visual=False):
     """
@@ -144,7 +138,7 @@ def _generate_figure(fs_id, fig_title, norms_path='./CSLB',
 
     # for feature fit
     categ = pd.read_csv(norms_path, sep='\t')
-    categ = categ[['feature type', 'concept', 'feature']]
+    categ = categ[['feature type', 'feature']]
 
     def get_feature_category(word_str):
         """Get all feature category"""
