@@ -205,7 +205,7 @@ def _store_data(fs_id, fp_id, file_path):
 
 def generate_figure(path, fig_title):
     df = pd.read_csv(path, index_col=0)
-    d = dict(zip(df.index.tolist, df.F1score.values))
+    d = dict(zip(df.index.tolist, df.F1score.values.tolist()))
 
     _generate_figure(fs_id=d, fig_title=fig_title)
 
