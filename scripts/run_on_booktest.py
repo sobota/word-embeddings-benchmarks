@@ -64,5 +64,5 @@ if __name__ == '__main__':
     e = Embedding.from_word2vec('~/Storage/fastbooks-skipgram.vec', 1462682, 100)
     run(e, opts, 'BooksCorpora Skipgram')
 
-    e = Embedding.from_word2vec(('~/Storage/fastbooks-cbow.vec', 1462682, 100)
+    e = Embedding.from_word2vec('~/Storage/fastbooks-cbow.vec', 1462682, 100)
     run(e, opts, 'BooksCorpora Cbow')
