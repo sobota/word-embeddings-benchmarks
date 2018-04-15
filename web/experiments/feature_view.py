@@ -1,9 +1,6 @@
 from __future__ import print_function
 import datetime
 import logging
-import os
-import re
-import sys
 from collections import defaultdict
 
 import numpy as np
@@ -16,7 +13,7 @@ from sklearn.model_selection import LeaveOneOut, GridSearchCV
 from tqdm import tqdm
 
 
-def _process_CSLB(feature_matrix_path, *embs):
+def process_CSLB(feature_matrix_path, *embs):
     df = pd.read_csv(feature_matrix_path, sep='\t', index_col=0)
 
     t = df.transpose()
@@ -112,9 +109,9 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
     return features_f1_scored, features_params
 
 
-def _generate_figure(fs_id, fig_title, norms_path='./CSLB/norms.dat',
-                     fig_path='./cslb_feature_view_{:%d-%m-%Y_%H:%M}.png'.format(datetime.datetime.now()),
-                     show_visual=False):
+def generate_figure(fs_id, fig_title, norms_path='./CSLB/norms.dat',
+                    fig_path='./cslb_feature_view_{:%d-%m-%Y_%H:%M}.png'.format(datetime.datetime.now()),
+                    show_visual=False):
     """
     This function generate picture for feature categories according to CLSB classification
 
@@ -186,7 +183,18 @@ def _generate_figure(fs_id, fig_title, norms_path='./CSLB/norms.dat',
     plt.close()
 
 
-def _store_data(fs_id, fp_id, file_path):
+def store_data(fs_id, fp_id, file_path):
+    """
+    fs_id: string
+        Dict mapping between feature name and F1 score
+
+    fp_id: string
+        Numpy ndarray contain parameters for each feature model
+
+    file_path: string
+        Path where figures and progress files will be saved
+    """
+
     score_df = pd.DataFrame(list(fs_id.items()), columns=['Feature', 'F1score'])
 
     # f, f1score, alpha, end_iter, intercept, rest_of_params
@@ -203,83 +211,56 @@ def _store_data(fs_id, fp_id, file_path):
     df.to_csv(file_path)
 
 
-def generate_figure(path, fig_title, norms_path):
+def figure_from_csv(path, fig_title, norms_path):
     df = pd.read_csv(path, index_col=0)
     d = dict(zip(df.index.tolist(), df.F1score.values))
 
-    _generate_figure(fs_id=d, fig_title=fig_title, norms_path=norms_path)
+    generate_figure(fs_id=d, fig_title=fig_title, norms_path=norms_path)
 
 
-def evaluate_cslb(embedding, cslb_path='./CSLB',
-                  save_path='./', figure_desc='', n_jobs=4, random_state=0, nb_hyper=20, max_iter=1800,
-                  display_figure=False):
+def evaluate_cslb(embedding, df_cleaned_cslb, n_jobs=4, nb_hyper=20, max_iter=1800, random_state=0):
     """
     Evaluate how well embedding encode features perceptual features. This experiment use CSLB semantic norms.
 
     Parameters
     ----------
-    embedding: Embedding object
+    embedding: Embedding
         Loaded embedding
 
-    cslb_path: string
-        Path to folder with cslb files norms.dat and feature_matrix.dat
+    df_cleaned_cslb: DataFrame
+        Preprocessed pandas clsb dataframe. Columns names are concepts.
 
     n_jobs: int
         Numbers of threads used for learning
 
-    save_path: string
-        Path where figures and progress files will be saved
-
-    figure_desc: string
-        Description after 'CSLB' in title
-
-    random_state: int or RandomState
-        Seed important for replicability
-
     nb_hyper: int
-        Number of hyperparm value to select. Used by logistics regression for each feature independly
+        Number of hyperparm value to select. Used by logistics regression for each feature independently
 
     max_iter: int
         Max iter of SGD
 
-    display_figure: bool
-        When is False matplotlib Agg backend is used for generating figures
+    random_state: int or RandomState
+        Seed important for replicability
+
+    Returns
+    -------
+    fs_id, fp_id: dict, ndarray
+      Dict mapping between feature name and F1 score. Numpy ndarray contain parameters for each feature model.
 
     References
     ----------
         Reference paper: 'Are distributional representations ready for the real world? Evaluating word vectors for grounded perceptual meaning'
         https://arxiv.org/abs/1705.11168
     """
-    cslb_matrix = os.path.join(cslb_path, 'feature_matrix.dat')
-    cslb_norm = os.path.join(cslb_path, 'norms.dat')
 
-    if not os.path.isfile(cslb_matrix):
-        print("Download CSLB file first from website: http://www.csl.psychol.cam.ac.uk/propertynorms/", file=sys.stderr)
-        raise FileNotFoundError(os.errno.ENOENT, os.strerror(os.errno.ENOENT), cslb_matrix)
-
-    if not os.path.isfile(cslb_norm):
-        print("Download CSLB file first from website: http://www.csl.psychol.cam.ac.uk/propertynorms/", file=sys.stderr)
-        raise FileNotFoundError(os.errno.ENOENT, os.strerror(os.errno.ENOENT), cslb_norm)
-
-    cleaned = _process_CSLB(cslb_matrix, embedding)
-
-    logging.info('Shape of cleaned CSLB is {}'.format(cleaned.shape))
-    cdf = cleaned.transpose()
+    logging.info('Shape of cleaned CSLB is {}'.format(df_cleaned_cslb.shape))
+    cdf = df_cleaned_cslb.transpose()
 
     concepts = [str(x) for x in cdf.index]
     features = cdf.columns
 
-    fs_id, fp_id = _learn_logit_reg(embedding=embedding, features=features, concepts=concepts, cleaned_norms=cleaned,
+    fs_id, fp_id = _learn_logit_reg(embedding=embedding, features=features, concepts=concepts,
+                                    cleaned_norms=df_cleaned_cslb,
                                     n_jobs=n_jobs, random_state=random_state, max_iter=max_iter, nb_hyper=nb_hyper)
-    logging.info('Generating Plots & Storing Data')
 
-    now_dt = datetime.datetime.now()
-
-    fig_path = os.path.join(save_path,
-                            'cslb_{}_{:%d-%m-%Y_%H:%M}.png'.format(re.sub('\s', '', figure_desc), now_dt))
-    store_path = os.path.join(save_path,
-                              'cslb_f1_params_{}_{:%d-%m-%Y_%H:%M}.csv'.format(re.sub('\s', '', figure_desc), now_dt))
-
-    _store_data(fs_id, fp_id, store_path)
-
-    _generate_figure(fs_id, fig_title=figure_desc, norms_path=cslb_norm, fig_path=fig_path, show_visual=display_figure)
+    return fs_id, fp_id

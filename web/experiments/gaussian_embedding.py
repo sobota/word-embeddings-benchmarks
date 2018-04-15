@@ -6,7 +6,7 @@ import sys
 
 import numpy as np
 import pandas as pd
-from .feature_view import _learn_logit_reg, _generate_figure, _store_data, _process_CSLB
+from .feature_view import _learn_logit_reg, generate_figure, store_data, process_CSLB
 from web.embeddings import Embedding
 
 
@@ -56,7 +56,7 @@ def cslb_on_gaussian_experiment(dimension, loc=0.0, scale=1.0, cslb_path='./CSLB
     embedding = Embedding.from_dict(
         gaussian_embedding(dim=dimension, words=words, loc=loc, scale=scale))
 
-    cleaned = _process_CSLB(cslb_matrix, embedding)
+    cleaned = process_CSLB(cslb_matrix, embedding)
 
     logging.info('Shape of cleaned CSLB is {}'.format(cleaned.shape))
     cdf = cleaned.transpose()
@@ -72,8 +72,8 @@ def cslb_on_gaussian_experiment(dimension, loc=0.0, scale=1.0, cslb_path='./CSLB
     fig_path = os.path.join(save_path,
                             'cslb_{}_{:%d-%m-%Y_%H:%M}.png'.format(re.sub('\s', '', figure_desc), now_dt))
 
-    _generate_figure(fs_id, fig_title=figure_desc, norms_path=cslb_norm, fig_path=fig_path, show_visual=show_dialog)
+    generate_figure(fs_id, fig_title=figure_desc, norms_path=cslb_norm, fig_path=fig_path, show_visual=show_dialog)
 
     store_path = os.path.join(save_path,
                               'cslb_f1_params_{}_{:%d-%m-%Y_%H:%M}.csv'.format(re.sub('\s', '', figure_desc), now_dt))
-    _store_data(fs_id, fp_id, store_path)
+    store_data(fs_id, fp_id, store_path)

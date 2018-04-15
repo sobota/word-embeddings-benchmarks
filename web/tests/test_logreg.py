@@ -1,5 +1,5 @@
 from web.embeddings import Embedding
-from web.experiments.feature_view import _generate_figure, _learn_logit_reg
+from web.experiments.feature_view import generate_figure, _learn_logit_reg
 import sys
 import os
 import logging
