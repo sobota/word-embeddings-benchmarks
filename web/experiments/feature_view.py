@@ -185,6 +185,8 @@ def generate_figure(fs_id, fig_title, norms_path='./CSLB/norms.dat',
 
 def store_data(fs_id, fp_id, file_path):
     """
+    Save data to .csv
+
     fs_id: string
         Dict mapping between feature name and F1 score
 
