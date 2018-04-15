@@ -60,8 +60,9 @@ if __name__ == '__main__':
     (opts, args) = parser.parse_args()
 
     # 1462682 dim = 100
-    e = Embedding.from_glove('~/Storage/fastbooks-skipgram.vec', 1462682, 100)
+
+    e = Embedding.from_word2vec('~/Storage/fastbooks-skipgram.vec', 1462682, 100)
     run(e, opts, 'BooksCorpora Skipgram')
 
-    e = Embedding.from_glove('~/Storage/fastbooks-cbow.vec', 1462682, 100)
+    e = Embedding.from_word2vec(('~/Storage/fastbooks-cbow.vec', 1462682, 100)
     run(e, opts, 'BooksCorpora Cbow')
