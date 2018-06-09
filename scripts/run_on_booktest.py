@@ -7,6 +7,7 @@ import os
 import re
 
 from web.embedding import Embedding
+from web.embeddings import *
 
 from web.experiments.feature_view import evaluate_cslb, store_data, process_CSLB, generate_figure
 
@@ -66,3 +67,5 @@ if __name__ == '__main__':
 
     e = Embedding.from_word2vec('~/Storage/fastbooks-cbow.vec')
     run(e, opts, 'BooksCorpora Cbow')
+
+    run(fetch_FastText(), opts, 'BooksCorpora fetch_FastText()')

@@ -69,6 +69,22 @@ def process_CSLB(feature_matrix_path, *embs):
     return cleaned_df
 
 
+def eval_clf(clf, X_test, y_test):
+    """
+    Crossentropy scoring function
+    :param clf:
+    :param X_test:
+    :param y_test:
+    :return:
+    """
+    pred_prob = clf.predict_proba(X_test)[:, 1]
+
+    pos_probs = np.log(pred_prob[y_test == 1])
+    neg_probs = np.log(1 - pred_prob[y_test == 0])
+
+    return np.mean(pos_probs) + np.mean(neg_probs)
+
+
 def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, random_state=None, nb_hyper=20,
                      max_iter=None):
     X = np.asarray([embedding[c_w] for c_w in concepts])
@@ -81,7 +97,7 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
             estimator=SGDClassifier(loss='log', class_weight='balanced', eta0=0.01, learning_rate='optimal',
                                     n_jobs=n_jobs, max_iter=max_iter, tol=1e-3, random_state=random_state),
             cv=LeaveOneOut(), param_grid={'alpha': np.logspace(start=-7, stop=1.0, num=nb_hyper)}, n_jobs=n_jobs,
-            scoring=make_scorer(f1_score))
+            scoring=eval_clf)
 
         gs.fit(X, y)
         f1s = f1_score(y_true=y, y_pred=gs.predict(X))
