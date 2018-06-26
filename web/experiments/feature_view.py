@@ -69,18 +69,19 @@ def process_CSLB(feature_matrix_path, *embs):
     return cleaned_df
 
 
-def eval_clf(clf, X_test, y_test):
+def score_clf(lr_clf, X_test, y_test):
     """
     Crossentropy scoring function
-    :param clf:
+    :param lr_clf: logregression
     :param X_test:
     :param y_test:
-    :return:
+    :return: crossentropy score
     """
-    pred_prob = clf.predict_proba(X_test)[:, 1]
+    pprob = lr_clf.predict_proba(X_test)[:, 1]
 
-    pos_probs = np.log(pred_prob[y_test == 1])
-    neg_probs = np.log(1 - pred_prob[y_test == 0])
+    # crossentropy
+    pos_probs = np.log(pprob[y_test == 1])
+    neg_probs = np.log(1 - pprob[y_test == 0])
 
     return np.mean(pos_probs) + np.mean(neg_probs)
 
@@ -97,7 +98,7 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
             estimator=SGDClassifier(loss='log', class_weight='balanced', eta0=0.01, learning_rate='optimal',
                                     n_jobs=n_jobs, max_iter=max_iter, tol=1e-3, random_state=random_state),
             cv=LeaveOneOut(), param_grid={'alpha': np.logspace(start=-7, stop=1.0, num=nb_hyper)}, n_jobs=n_jobs,
-            scoring=eval_clf)
+            scoring=score_clf)
 
         gs.fit(X, y)
         f1s = f1_score(y_true=y, y_pred=gs.predict(X))
@@ -175,7 +176,7 @@ def generate_figure(fs_id, fig_title, norms_path='./CSLB/norms.dat',
 
     # workaround for running matplotlib image generation without Xserver
     if not show_visual:
-        logging.info('Switching matplotlib backend to Agg')
+        logging.info('Switching matplotlib backend to agg')
         plt.switch_backend('agg')
 
     sns.set_style("whitegrid")

@@ -6,7 +6,6 @@ import sys
 import os
 import re
 
-from web.embedding import Embedding
 from web.embeddings import *
 
 from web.experiments.feature_view import evaluate_cslb, store_data, process_CSLB, generate_figure
@@ -54,7 +53,7 @@ if __name__ == '__main__':
 
     parser = optparse.OptionParser()
     parser.add_option("-j", "--n_jobs", type="int", default=45)
-    parser.add_option("-m", "--max_iter", type="int", default=2000)
+    parser.add_option("-m", "--max_iter", type="int", default=1800)
     parser.add_option("-c", "--cslb_path", type="string", default='~')
     parser.add_option("-s", "--save_path", type="string", default='./')
 
