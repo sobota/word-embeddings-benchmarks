@@ -9,7 +9,7 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import f1_score, make_scorer
-from sklearn.model_selection import LeaveOneOut, GridSearchCV
+from sklearn.model_selection import LeaveOneOut, GridSearchCV, StratifiedKFold
 from tqdm import tqdm
 
 
@@ -94,10 +94,12 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
     def train(f):
         y = cleaned_norms.loc[f].values
 
+        cv = StratifiedKFold(n_splits=10) if y.nonzero()[0].size > 15 else SinglePositiveCrossValidator()
+
         gs = GridSearchCV(
             estimator=SGDClassifier(loss='log', class_weight='balanced', eta0=0.01, learning_rate='optimal',
                                     n_jobs=n_jobs, max_iter=max_iter, tol=1e-3, random_state=random_state),
-            cv=LeaveOneOut(), param_grid={'alpha': np.logspace(start=-7, stop=1.0, num=nb_hyper)}, n_jobs=n_jobs,
+            cv=cv, param_grid={'alpha': np.logspace(start=-7, stop=1.0, num=nb_hyper)}, n_jobs=n_jobs,
             scoring=score_clf)
 
         gs.fit(X, y)
@@ -283,3 +285,22 @@ def evaluate_cslb(embedding, df_cleaned_cslb, n_jobs=4, nb_hyper=20, max_iter=18
                                     n_jobs=n_jobs, random_state=random_state, max_iter=max_iter, nb_hyper=nb_hyper)
 
     return fs_id, fp_id
+
+
+class SinglePositiveCrossValidator(LeaveOneOut):
+    def split(self, X, y=None, groups=None):
+        assert y is not None
+
+        pos_y = y.nonzero()[0]
+        neg_y = (1 - y).nonzero()[0]
+
+        for p in pos_y:
+            X_train = np.concatenate([np.arange(start=0, stop=p), np.arange(start=p + 1, stop=X.shape[0])])
+            X_test = np.concatenate([[p], neg_y])
+
+            yield X_train, X_test
+
+    def get_n_splits(self, X, y=None, groups=None):
+        assert y is not None
+
+        return np.nonzero(y)[0].size
