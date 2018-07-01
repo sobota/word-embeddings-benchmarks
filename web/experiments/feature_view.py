@@ -93,7 +93,8 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
     def train(f):
         y = cleaned_norms.loc[f].values
 
-        cv = StratifiedKFold(n_splits=10) if y.nonzero()[0].size > 15 else SinglePositiveCrossValidator()
+        cv = StratifiedKFold(n_splits=10, random_state=random_state) if y.nonzero()[
+                                                                            0].size > 15 else SinglePositiveCrossValidator()
 
         gs = GridSearchCV(
             estimator=SGDClassifier(loss='log', class_weight='balanced', eta0=0.01, learning_rate='optimal',
