@@ -73,8 +73,6 @@ def score_clf(lr_clf, X_test, y_test):
     """
     Crossentropy scoring function
     :param lr_clf: logregression
-    :param X_test:
-    :param y_test:
     :return: crossentropy score
     """
     pprob = lr_clf.predict_proba(X_test)[:, 1]
@@ -288,9 +286,11 @@ def evaluate_cslb(embedding, df_cleaned_cslb, n_jobs=4, nb_hyper=20, max_iter=18
 
 
 class SinglePositiveCrossValidator(LeaveOneOut):
-    def split(self, X, y=None, groups=None):
-        assert y is not None
+    """
+    CrossValidator with number of folds dependent on positive samples.
+    """
 
+    def split(self, X, y=None, groups=None):
         pos_y = y.nonzero()[0]
         neg_y = (1 - y).nonzero()[0]
 
@@ -301,6 +301,4 @@ class SinglePositiveCrossValidator(LeaveOneOut):
             yield X_train, X_test
 
     def get_n_splits(self, X, y=None, groups=None):
-        assert y is not None
-
         return np.nonzero(y)[0].size
