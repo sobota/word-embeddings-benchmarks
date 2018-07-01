@@ -14,22 +14,24 @@ To evaluate your embedding (converted to word2vec or python dict pickle)
 on all fast-running benchmarks execute `./scripts/eval_on_all.py <path-to-file>`.
 See `here <https://github.com/kudkudak/word-embeddings-benchmarks/wiki>`_ results for embeddings available in the package.
 
+Warnings and Disclaimers:
+
+* Analogy test does not normalize internally word embeddings.
+* **Package is currently under development, and we expect within next few months an official release**. The main issue that might hit you at the moment is rather long embeddings loading times (especially if you use fetchers).
+
 Please also refer to our recent publication on evaluation methods https://arxiv.org/abs/1702.02170.
-
-Disclaimer:
-
-Package is currently under development, and we expect within next few months an official release. The main issue that might hit you at the moment is rather long embeddings loading times (especially if you use fetchers).
 
 Features:
 
 * scikit-learn API and conventions
-* 17 popular datasets
-* 12 word embeddings (word2vec, HPCA, morphoRNNLM, GloVe, LexVec, ConceptNet, HDC/PDC and others)
+* 18 popular datasets
+* 11 word embeddings (word2vec, HPCA, morphoRNNLM, GloVe, LexVec, ConceptNet, HDC/PDC and others)
 * methods to solve analogy, similarity and categorization tasks
 * embedding perceptual feature encoding evaluation based on semantic norm
 
 Included datasets:
 
+* TR9856
 * WordRep
 * Google Analogy
 * MSR Analogy
