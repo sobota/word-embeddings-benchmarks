@@ -57,6 +57,7 @@ def process_CSLB(feature_matrix_path, *embs):
 
     # remove before feature selection
     cleaned_df = t.drop(word_to_rm, axis=1)
+    logging.info('Dropped {} words'.format(len(word_to_rm)))
 
     f_summed = cleaned_df.sum(axis=1)
 
