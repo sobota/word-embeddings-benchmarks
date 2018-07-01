@@ -9,7 +9,7 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import f1_score, make_scorer
-from sklearn.model_selection import LeaveOneOut, GridSearchCV
+from sklearn.model_selection import LeaveOneOut, GridSearchCV, StratifiedKFold
 from tqdm import tqdm
 
 
@@ -69,6 +69,21 @@ def process_CSLB(feature_matrix_path, *embs):
     return cleaned_df
 
 
+def score_clf(lr_clf, X_test, y_test):
+    """
+    Crossentropy scoring function
+    :param lr_clf: logregression
+    :return: crossentropy score
+    """
+    pprob = lr_clf.predict_proba(X_test)[:, 1]
+
+    # crossentropy
+    pos_probs = np.log(pprob[y_test == 1])
+    neg_probs = np.log(1 - pprob[y_test == 0])
+
+    return np.mean(pos_probs) + np.mean(neg_probs)
+
+
 def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, random_state=None, nb_hyper=20,
                      max_iter=None):
     X = np.asarray([embedding[c_w] for c_w in concepts])
@@ -77,11 +92,13 @@ def _learn_logit_reg(embedding, features, concepts, cleaned_norms, n_jobs=4, ran
     def train(f):
         y = cleaned_norms.loc[f].values
 
+        cv = StratifiedKFold(n_splits=10) if y.nonzero()[0].size > 15 else SinglePositiveCrossValidator()
+
         gs = GridSearchCV(
             estimator=SGDClassifier(loss='log', class_weight='balanced', eta0=0.01, learning_rate='optimal',
                                     n_jobs=n_jobs, max_iter=max_iter, tol=1e-3, random_state=random_state),
-            cv=LeaveOneOut(), param_grid={'alpha': np.logspace(start=-7, stop=1.0, num=nb_hyper)}, n_jobs=n_jobs,
-            scoring=make_scorer(f1_score))
+            cv=cv, param_grid={'alpha': np.logspace(start=-7, stop=1.0, num=nb_hyper)}, n_jobs=n_jobs,
+            scoring=score_clf)
 
         gs.fit(X, y)
         f1s = f1_score(y_true=y, y_pred=gs.predict(X))
@@ -159,7 +176,7 @@ def generate_figure(fs_id, fig_title, norms_path='./CSLB/norms.dat',
 
     # workaround for running matplotlib image generation without Xserver
     if not show_visual:
-        logging.info('Switching matplotlib backend to Agg')
+        logging.info('Switching matplotlib backend to agg')
         plt.switch_backend('agg')
 
     sns.set_style("whitegrid")
@@ -266,3 +283,22 @@ def evaluate_cslb(embedding, df_cleaned_cslb, n_jobs=4, nb_hyper=20, max_iter=18
                                     n_jobs=n_jobs, random_state=random_state, max_iter=max_iter, nb_hyper=nb_hyper)
 
     return fs_id, fp_id
+
+
+class SinglePositiveCrossValidator(LeaveOneOut):
+    """
+    CrossValidator with number of folds dependent on positive samples.
+    """
+
+    def split(self, X, y=None, groups=None):
+        pos_y = y.nonzero()[0]
+        neg_y = (1 - y).nonzero()[0]
+
+        for p in pos_y:
+            X_train = np.concatenate([np.arange(start=0, stop=p), np.arange(start=p + 1, stop=X.shape[0])])
+            X_test = np.concatenate([[p], neg_y])
+
+            yield X_train, X_test
+
+    def get_n_splits(self, X, y=None, groups=None):
+        return np.nonzero(y)[0].size

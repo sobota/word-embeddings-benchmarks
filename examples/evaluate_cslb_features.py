@@ -37,7 +37,7 @@ if __name__ == '__main__':
     for corpus in ["common-crawl-42B", "common-crawl-840B"]:
         jobs.append(["fetch_GloVe", {"dim": 300, "corpus": corpus}])
 
-    # # PDC and HDC
+    # PDC and HDC
     for dim in [50, 100, 300]:
         jobs.append(["fetch_PDC", {"dim": dim}])
         jobs.append(["fetch_HDC", {"dim": dim}])
@@ -50,10 +50,10 @@ if __name__ == '__main__':
 
     # ConceptNet Numberbatch
     jobs.append(["fetch_conceptnet_numberbatch", {}])
-
+    #
     # FastText
     jobs.append(["fetch_FastText", {}])
-
+    #
     # Word2Bits
     jobs.append(['fetch_Word2Bits', {}])
 

@@ -85,6 +85,7 @@ def test_on_real_embedding():
 
 
 def test_figure_generation():
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     fetaures = ['comes_in_a_stick', 'does_DIY', 'does_absorb_water', 'does_add_air',
                 'does_affect_urine', 'does_allow_movement', 'does_attach_things',
                 'does_attract_attention', 'does_baa_bleat', 'does_bark',
