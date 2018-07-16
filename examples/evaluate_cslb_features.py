@@ -8,7 +8,7 @@ import re
 
 from web import embeddings
 
-from web.experiments.feature_view import evaluate_cslb, store_data, process_CSLB, generate_figure
+from web.perceptual.feature_view import evaluate_cslb, store_data, process_CSLB, generate_figure
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)

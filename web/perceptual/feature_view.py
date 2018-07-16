@@ -47,7 +47,7 @@ def process_CSLB(feature_matrix_path, *embs):
 
         for e in emb:
             for c in concepts_str:
-                if c not in e.words:
+                if c not in e.vocabulary:
                     lack_words.append(c)
 
         return set(lack_words)
