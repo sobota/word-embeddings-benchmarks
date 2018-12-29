@@ -14,6 +14,10 @@ from tqdm import tqdm
 
 
 def process_CSLB(feature_matrix_path, *embs):
+    """
+    If you do not downloaded CSLB norm yet please visit first: https://csl.psychol.cam.ac.uk/propertynorms/
+    """
+
     df = pd.read_csv(feature_matrix_path, sep='\t', index_col=0)
 
     t = df.transpose()
@@ -239,7 +243,7 @@ def figure_from_csv(path, fig_title, norms_path):
     generate_figure(fs_id=d, fig_title=fig_title, norms_path=norms_path)
 
 
-def evaluate_cslb(embedding, df_cleaned_cslb, n_jobs=4, nb_hyper=20, max_iter=1800, random_state=0):
+def evaluate(embedding, df_cleaned_cslb, n_jobs=4, nb_hyper=20, random_state=0):
     """
     Evaluate how well embedding encode features perceptual features. This experiment use CSLB semantic norms.
 
@@ -256,9 +260,6 @@ def evaluate_cslb(embedding, df_cleaned_cslb, n_jobs=4, nb_hyper=20, max_iter=18
 
     nb_hyper: int
         Number of hyperparm value to select. Used by logistics regression for each feature independently
-
-    max_iter: int
-        Max iter of SGD
 
     random_state: int or RandomState
         Seed important for replicability
@@ -280,6 +281,8 @@ def evaluate_cslb(embedding, df_cleaned_cslb, n_jobs=4, nb_hyper=20, max_iter=18
     concepts = [str(x) for x in cdf.index]
     features = cdf.columns
 
+    # for standardizing test
+    max_iter = 1000
     fs_id, fp_id = _learn_logit_reg(embedding=embedding, features=features, concepts=concepts,
                                     cleaned_norms=df_cleaned_cslb,
                                     n_jobs=n_jobs, random_state=random_state, max_iter=max_iter, nb_hyper=nb_hyper)

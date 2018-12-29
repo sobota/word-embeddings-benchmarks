@@ -2,22 +2,22 @@ from multiprocessing.pool import Pool
 import datetime
 import logging
 import optparse
-import sys
 import os
 import re
+import sys
+
+from tqdm import tqdm
 
 from web import embeddings
-
-from web.perceptual.feature_view import evaluate_cslb, store_data, process_CSLB, generate_figure
+from web import perceptual as pc
 
 if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
 
     logging.info('The feature view')
 
     parser = optparse.OptionParser()
     parser.add_option("-j", "--n_jobs", type="int", default=45)
-    parser.add_option("-m", "--max_iter", type="int", default=2000)
     parser.add_option("-c", "--cslb_path", type="string", default='../CSLB')
     parser.add_option("-s", "--save_path", type="string", default='./')
 
@@ -79,9 +79,9 @@ if __name__ == '__main__':
                   file=sys.stderr)
             raise FileNotFoundError(os.errno.ENOENT, os.strerror(os.errno.ENOENT), cslb_norm)
 
-        df_cleaned = process_CSLB(cslb_matrix, w)
+        df_cleaned = pc.process_CSLB(cslb_matrix, w)
 
-        f1, params = evaluate_cslb(w, df_cleaned_cslb=df_cleaned, n_jobs=n_jobs, max_iter=opts.max_iter)
+        f1, params = pc.evaluate(w, df_cleaned_cslb=df_cleaned, n_jobs=n_jobs)
 
         logging.info('Generating Plots & Storing Data')
 
@@ -93,11 +93,12 @@ if __name__ == '__main__':
                                   'cslb_f1_params_{}_{:%d-%m-%Y_%H:%M}.csv'.format(re.sub('\s', '', title_part),
                                                                                    now_dt))
 
-        store_data(f1, params, store_path)
+        pc.store_data(f1, params, store_path)
 
-        generate_figure(f1, fig_title=title_part, norms_path=cslb_norm, fig_path=fig_path)
+        pc.generate_figure(f1, fig_title=title_part, norms_path=cslb_norm, fig_path=fig_path)
 
         logging.info('End of experiment for {}'.format(title_part))
 
 
-    Pool(n_jobs).map(run_job, jobs)
+    for j in tqdm(jobs):
+        run_job(j)

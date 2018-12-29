@@ -4,7 +4,7 @@ import logging
 import numpy as np
 import pandas as pd
 from web.embeddings import fetch_GloVe, Embedding
-from web.perceptual.feature_view import process_CSLB, generate_figure, _learn_logit_reg
+from web.perceptual import process_CSLB, generate_figure, _learn_logit_reg
 
 
 def test_cleaning_cslb():
