@@ -1,4 +1,4 @@
-from multiprocessing.pool import Pool
+from __future__ import print_function
 import datetime
 import logging
 import optparse
@@ -14,7 +14,7 @@ from web import perceptual as pc
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
 
-    logging.info('The feature view')
+    logging.info('Perceptual evaluation')
 
     parser = optparse.OptionParser()
     parser.add_option("-j", "--n_jobs", type="int", default=45)
