@@ -17,7 +17,7 @@ if __name__ == '__main__':
     logging.info('Perceptual evaluation')
 
     parser = optparse.OptionParser()
-    parser.add_option("-j", "--n_jobs", type="int", default=45)
+    parser.add_option("-j", "--n_jobs", type="int", default=-1)
     parser.add_option("-c", "--cslb_path", type="string", default='../CSLB')
     parser.add_option("-s", "--save_path", type="string", default='./')
 
